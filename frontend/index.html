@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Buscador de Videos</title>
+</head>
+<body>
+    <h1>Buscador de Videos</h1>
+    <input type="text" id="busqueda" placeholder="Buscar...">
+    <button onclick="buscarVideos()">Buscar</button>
+    <div id="resultados"></div>
+    <h2>Subir Video</h2>
+    <input type="file" id="videoFile">
+    <button onclick="subirVideo()">Subir</button>
+
+    <script>
+        const apiBaseUrl = 'http://192.168.49.2:30001';
+
+        async function buscarVideos() {
+            const consulta = document.getElementById('busqueda').value;
+            const response = await fetch(`${apiBaseUrl}/api/buscar?consulta=${encodeURIComponent(consulta)}`);
+            const videos = await response.json();
+            const resultadosDiv = document.getElementById('resultados');
+            resultadosDiv.innerHTML = '';
+            videos.forEach(video => {
+                const videoElement = document.createElement('div');
+                videoElement.innerHTML = `
+                    <h3>${video.nombre}</h3>
+                    <video width="640" height="360" controls>
+                        <source src="${apiBaseUrl}/videos/${video.nombre}" type="video/mp4">
+                        Tu navegador no soporta la reproducción de videos.
+                    </video>
+                `;
+                resultadosDiv.appendChild(videoElement);
+            });
+        }
+
+        async function subirVideo() {
+            const videoFile = document.getElementById('videoFile').files[0];
+            if (!videoFile) {
+                alert('Por favor, selecciona un video.');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('video', videoFile);
+            const response = await fetch(`${apiBaseUrl}/api/subir`, {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            alert(result.mensaje);
+        }
+    </script>
+</body>
+</html>

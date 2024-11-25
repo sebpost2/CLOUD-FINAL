@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: video-backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: video-backend
+  template:
+    metadata:
+      labels:
+        app: video-backend
+    spec:
+      containers:
+      - name: video-backend
+        image: sebpost2/video-backend:latest
+        ports:
+        - containerPort: 5000
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+        volumeMounts:
+        - name: video-storage
+          mountPath: /app/videos
+      volumes:
+      - name: video-storage
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: video-backend-service
+spec:
+  type: NodePort
+  selector:
+    app: video-backend
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+    nodePort: 30001

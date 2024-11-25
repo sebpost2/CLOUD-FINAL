@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: video-frontend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: video-frontend
+  template:
+    metadata:
+      labels:
+        app: video-frontend
+    spec:
+      containers:
+      - name: video-frontend
+        image: sebpost2/video-frontend:latest
+        ports:
+        - containerPort: 80
